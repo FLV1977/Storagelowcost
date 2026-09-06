@@ -21,18 +21,48 @@
     text-align:center;padding:24px;box-sizing:border-box;
   }
   img{height:72px;width:auto;margin-bottom:18px;}
-  p{font-size:15px;opacity:.85;margin:4px 0;}
-  a{color:#7FB8FF;text-decoration:underline;}
+  p{font-size:15px;opacity:.85;margin:4px 0 20px;max-width:320px;line-height:1.4;}
+  a.btn{
+    background:#fff;color:#0B2C55;font-weight:600;text-decoration:none;
+    padding:14px 28px;border-radius:8px;font-size:16px;display:inline-block;
+  }
+  #installHint{display:none;}
 </style>
 </head>
 <body>
   <img src="/apple-touch-icon.png" alt="Storage Lowcost Armazenamento">
-  <p>A abrir a aplicação…</p>
-  <p><a id="fallbackLink" href="#">Clique aqui se não for redirecionado</a></p>
+
+  <div id="autoRedirect" style="display:none;">
+    <p>A abrir a aplicação…</p>
+  </div>
+
+  <div id="manualScreen" style="display:none;">
+    <p id="installHint">
+      Antes de continuares: toca em <b>Partilhar</b> e depois em
+      <b>"Adicionar ao Ecrã Principal"</b> — assim o ícone e o nome ficam corretos.
+      Depois de adicionado, abre sempre a partir desse ícone.
+    </p>
+    <a class="btn" id="openAppBtn" href="#">Abrir aplicação</a>
+  </div>
+
   <script>
     var APP_URL = "https://script.google.com/macros/s/AKfycbyu7pAZCFRVvZTI5XTIqNaTJiB0L5FWostbMZX00GvDtZHOPHKw5UzXtXc53Fn-AmWvsw/exec";
-    document.getElementById('fallbackLink').href = APP_URL;
-    window.location.replace(APP_URL);
+
+    // Já está a correr como app instalada no ecrã principal (iOS) ou em modo standalone (Android/PWA)?
+    var isStandalone = (window.navigator.standalone === true) ||
+                        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+
+    if (isStandalone) {
+      // Aberto a partir do ícone instalado — redireciona logo, sem mostrar nada.
+      document.getElementById('autoRedirect').style.display = '';
+      window.location.replace(APP_URL);
+    } else {
+      // Primeira visita / browser normal — não redireciona automaticamente,
+      // para dar tempo de "Adicionar ao Ecrã Principal" com o logo e nome corretos.
+      document.getElementById('manualScreen').style.display = '';
+      document.getElementById('installHint').style.display = '';
+      document.getElementById('openAppBtn').href = APP_URL;
+    }
   </script>
 </body>
 </html>
